@@ -1,0 +1,84 @@
+================================================================================
+PRODUCT REQUIREMENT DOCUMENT (PRD) - UPDATED VERSION
+PLATFORM AUTOMATION PEMBUATAN ARTIKEL SEO & AUTO-PUBLISHER WORDPRESS (SAAS)
+================================================================================
+
+[INFORMASI PROYEK]
+Nama Proyek    : WordPress Content Automation Platform (Gen-AutoPress)
+Pengembang     : Muhammad Rizky Nurrohman (NIM: 19240401)
+Instansi       : Universitas Bina Sarana Informatika (UBSI) Kampus Solo
+Lokasi Magang  : Solo Berkah Web (Grogol, Sukoharjo)
+Model Aplikasi : Multi-Tenant SaaS (Software as a Service)
+
+================================================================================
+1. RINGKASAN PROYEK & TUJUAN
+================================================================================
+Membangun platform berbasis web SaaS (RBAC) yang mengotomatiskan pembuatan artikel 
+teroptimasi SEO dan pendistribusiannya ke berbagai situs WordPress sekaligus.
+Awalnya dirancang sebagai alat desktop lokal, kini berevolusi menjadi platform 
+berskala besar dengan sistem akun, batasan jumlah situs per pengguna, analisis
+performa, hingga kemampuan mengubah desain UI WordPress menggunakan perintah AI (Prompt).
+
+================================================================================
+2. HAK AKSES & PERAN (ROLE-BASED ACCESS CONTROL)
+================================================================================
+
+A. ROLE UMUM (PUBLIC / GUEST)
+--------------------------------------------------------------------------------
+- Hak Akses : Terbatas pada halaman utama (Landing Page / Dashboard Umum).
+- Fungsi    : Melihat pengenalan proyek, fitur-fitur, dan alur kerja aplikasi.
+- Navigasi  : Memiliki akses ke tombol "Sign In" dan "Get Started" yang akan 
+              mengarahkan pengunjung ke halaman Registrasi atau Login.
+
+B. ROLE USER (MEMBER)
+--------------------------------------------------------------------------------
+- Hak Akses : Memerlukan Login. Diarahkan ke Dashboard User.
+- Batasan   : 1 Akun User HANYA DAPAT mengelola maksimal 10 Akun WordPress.
+              (Ditujukan untuk menjaga kestabilan dan beban performa server).
+- Fitur Utama :
+  1. WP Automation (Multi-Site Broadcast)
+     - User cukup melakukan 1 kali klik untuk men-generate artikel (H2/H4), 
+       gambar AI, outlink Wikipedia, dan SEO Metadata.
+     - Sistem akan langsung mendistribusikan/memposting artikel tersebut 
+       secara OTOMATIS ke SELURUH akun WordPress (maks 10) yang terhubung.
+  2. Analisis dan Performance
+     - Dasbor pemantauan statistik lalu lintas, SEO, dan artikel dari tiap 
+       akun WordPress yang terhubung.
+     - Menampilkan laporan artikel "Top Trending".
+  3. Tool UI (Theme Modifier AI)
+     - Alat pengubah tampilan/tatanan letak UI website WordPress menggunakan 
+       perintah teks (Prompt).
+     - Menggunakan teknologi MCP yang terhubung dengan AI.
+     - Mirip dengan plugin 'WPVibe - Connect Your Site to Claude, ChatGPT & AI Assistants'.
+     - Terhubung penuh ke WordPress target melalui REST API.
+
+C. ROLE ADMIN (SUPERUSER)
+--------------------------------------------------------------------------------
+- Hak Akses : Memerlukan Login. Diarahkan ke Dashboard Admin.
+- Fitur Utama :
+  1. Manajemen Akun User (User Management)
+     - Mengontrol, memblokir, atau mengelola pengguna yang terdaftar di platform.
+  2. Monitoring Akun WordPress (Read-Only)
+     - Admin dapat melihat daftar akun WordPress mana saja yang sedang dihubungkan 
+       atau dikelola oleh suatu Akun User.
+
+================================================================================
+3. MEKANISME INTEGRASI WORDPRESS
+================================================================================
+- Koneksi ke semua akun WordPress klien atau personal menggunakan fitur standar 
+  WordPress yaitu "Application Passwords" dan "WP REST API".
+- Hal ini menghilangkan kebutuhan untuk menginstal plugin kustom (kecuali untuk 
+  kebutuhan spesifik Tool UI MCP jika diperlukan).
+
+================================================================================
+4. MODUL GENERASI KONTEN (WARISAN PRD SEBELUMNYA)
+================================================================================
+- AI Text & SEO Engine: Generate Judul, Paragraf, H2, H4, Slug, Meta Deskripsi, 
+  dan LSI Keywords.
+- Auto Wikipedia Outlink: Deteksi nama kota/daerah secara otomatis dan jadikan 
+  hyperlink Wikipedia.
+- AI Image Engine: Membuat Featured Image otomatis yang relevan dengan topik.
+
+================================================================================
+Status Dokumen: Diperbarui & Disetujui
+================================================================================

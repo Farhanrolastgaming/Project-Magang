@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gen-AutoPress | WordPress Automation</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/jpeg" href="/static/logo_Gen-AutoPress.jpg">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1E3A8A',
+                        secondary: '#3B82F6',
+                        accent: '#10B981',
+                        dark: '#1F2937',
+                        light: '#F3F4F6'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .prose h2 { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: #1E3A8A; }
+        .prose h4 { font-size: 1.125rem; font-weight: 600; margin-top: 1rem; margin-bottom: 0.5rem; color: #1F2937; }
+        .prose p { margin-bottom: 1rem; color: #374151; line-height: 1.6; }
+        .prose a { color: #3B82F6; text-decoration: none; }
+        .prose a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body class="bg-light text-dark font-sans h-screen flex flex-col overflow-hidden" x-data="automationApp()">
+
+    <!-- Global Floating Alert -->
+    <div x-show="alert.show" 
+         x-transition:enter="transition ease-out duration-300 transform"
+         x-transition:enter-start="opacity-0 -translate-y-4"
+         x-transition:enter-end="opacity-100 translate-y-0"
+         x-transition:leave="transition ease-in duration-200 transform"
+         x-transition:leave-start="opacity-100 translate-y-0"
+         x-transition:leave-end="opacity-0 -translate-y-4"
+         class="fixed top-6 left-1/2 transform -translate-x-1/2 z-[9999] px-6 py-3 rounded-lg shadow-xl border min-w-[300px] text-center font-semibold"
+         :class="{'bg-green-500 border-green-600 text-white': alert.type === 'success', 'bg-red-500 border-red-600 text-white': alert.type === 'error'}" 
+         style="display: none;">
+        <span x-html="alert.message"></span>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-primary text-white shadow relative z-10 flex items-center justify-between px-6 py-4">
+        <div class="flex items-center gap-3 space-x-4">
+            <img src="/static/logo_Gen-AutoPress.jpg" alt="Logo" class="h-10 w-10 rounded shadow-md object-cover bg-white">
+            <div>
+                <h1 class="text-xl font-bold tracking-wide">Gen-AutoPress</h1>
+                <p class="text-xs text-blue-200">WordPress Content Automation Platform v1.0</p>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4 text-sm">
+            <span class="flex items-center bg-blue-900 bg-opacity-50 px-3 py-1 rounded-full text-blue-100">
+                <span class="w-2 h-2 rounded-full bg-accent mr-2"></span> Engine Online
+            </span>
+            <div class="flex items-center space-x-2">
+                <div class="w-8 h-8 rounded-full bg-white text-primary flex items-center justify-center font-bold">A</div>
+                <span>Admin</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex overflow-hidden">
+        
+        <!-- Left Panel: Input Configuration -->
+        <section class="w-1/3 bg-white border-r border-gray-200 p-6 overflow-y-auto flex flex-col shadow-inner z-0 relative">
+            <h2 class="text-lg font-bold mb-5 flex items-center text-primary border-b pb-2">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                Konfigurasi Input
+            </h2>
+            
+            <form id="configForm" @submit.prevent="generateContent" class="space-y-4">
+                
+                <!-- WP Target -->
+                <div class="p-4 bg-blue-50 border border-blue-100 rounded-md space-y-3">
+                    <h3 class="text-sm font-semibold text-primary mb-2 border-b border-blue-200 pb-1">1. Sinkronisasi WordPress</h3>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">URL Website</label>
+                        <input type="url" x-model="formData.wp_url" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-secondary" placeholder="https://website-klien.com" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">Username</label>
+                            <input type="text" x-model="formData.username" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-secondary" placeholder="admin" required>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">App Password</label>
+                            <input type="password" x-model="formData.app_password" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:ring-secondary" placeholder="**** ****" required>
+                        </div>
+                    </div>
+                    
+                    <button type="button" @click="checkWordPress" class="w-full mt-2 bg-secondary hover:bg-blue-600 text-white text-xs font-semibold py-2 px-4 rounded transition flex justify-center items-center h-8" :disabled="isCheckingWP || !formData.wp_url || !formData.username || !formData.app_password">
+                        <svg x-show="isCheckingWP" class="animate-spin -ml-1 mr-2 h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span x-text="isCheckingWP ? 'Menghubungkan...' : 'Hubungkan & Muat Kategori'"></span>
+                    </button>
+                    <p x-show="wpConnected" class="text-xs text-green-600 font-medium pt-1">✅ Terhubung penuh. <span x-text="loadedCategories.length"></span> Kategori dimuat.</p>
+                </div>
+                
+                <!-- Category Checklist -->
+                <div class="border border-gray-200 p-3 rounded bg-white relative">
+                    <div x-show="!wpConnected" class="absolute inset-0 bg-white bg-opacity-70 z-10 flex items-center justify-center backdrop-blur-sm">
+                        <span class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full border">Masukkan WP & Hubungkan dahulu</span>
+                    </div>
+
+                    <label class="block text-sm font-medium text-gray-700 mb-2">2. Pilih Kategori Postingan <span class="text-xs text-gray-400 font-normal">(Teratas = Primary)</span></label>
+                    <div class="max-h-52 overflow-y-auto border border-gray-200 rounded p-2 text-sm space-y-1 bg-gray-50 mb-2" style="scrollbar-width: thin;">
+                        <template x-if="loadedCategories.length === 0">
+                            <p class="text-xs text-gray-400 italic text-center py-3">Pencet Hubungkan Untuk Memuat Kategori</p>
+                        </template>
+                        <template x-for="cat in loadedCategories" :key="cat">
+                            <div class="flex items-center justify-between p-1 hover:bg-white rounded transition">
+                                <label class="flex items-center space-x-2 cursor-pointer flex-1">
+                                    <input type="checkbox" :value="cat" x-model="formData.categories" class="rounded border-gray-300 text-primary shadow-sm focus:ring-primary">
+                                    <span x-text="cat" class="text-gray-700"></span>
+                                </label>
+                                <template x-if="formData.categories.includes(cat)">
+                                    <div class="ml-2 flex-shrink-0">
+                                        <span x-show="formData.categories[0] === cat" class="text-[10px] bg-yellow-100 text-yellow-800 border border-yellow-300 px-2 py-0.5 rounded-full font-bold">⭐ Primary</span>
+                                        <button x-show="formData.categories[0] !== cat" type="button" @click.prevent="setPrimaryCategory(cat)" class="text-[10px] bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 px-2 py-0.5 rounded-full transition font-semibold">+ Make Primary</button>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                        
+                        <template x-for="cCat in customCategories" :key="cCat">
+                            <div class="flex items-center justify-between p-1 hover:bg-white rounded border border-blue-100 bg-blue-50 mt-1 transition"
+                                 :class="newCategoryParents[cCat] ? 'ml-6 !border-l-4 !border-l-blue-400' : ''">
+                                <label class="flex items-center space-x-2 cursor-pointer flex-1">
+                                    <input type="checkbox" :value="cCat" x-model="formData.categories" class="rounded border-blue-300 text-primary shadow-sm focus:ring-primary">
+                                    <div>
+                                        <span x-text="cCat + ' (Baru)'" class="text-blue-800 font-medium text-xs block"></span>
+                                        <span x-show="newCategoryParents[cCat]" class="text-[10px] text-gray-500 italic block">Anak dari: <strong x-text="newCategoryParents[cCat]"></strong></span>
+                                    </div>
+                                </label>
+                                <template x-if="formData.categories.includes(cCat)">
+                                    <div class="ml-2 flex-shrink-0">
+                                        <span x-show="formData.categories[0] === cCat" class="text-[10px] bg-yellow-100 text-yellow-800 border border-yellow-300 px-2 py-0.5 rounded-full font-bold">⭐ Primary</span>
+                                        <button x-show="formData.categories[0] !== cCat" type="button" @click.prevent="setPrimaryCategory(cCat)" class="text-[10px] bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 px-2 py-0.5 rounded-full transition font-semibold">+ Make Primary</button>
+                                    </div>
+                                </template>
+                            </div>
+                        </template>
+                    </div>
+                    
+                    <div class="flex flex-col gap-2 relative z-20 border-t pt-2 mt-1">
+                        <select x-model="newCategoryParent" class="border border-gray-300 rounded px-2 py-1.5 text-xs focus:ring-secondary w-full bg-white text-gray-600">
+                            <option value="">-- Buat sbg Kategori Dasar (Tanpa Induk) --</option>
+                            <template x-for="opt in loadedCategories" :key="opt">
+                                <option :value="opt" x-text="'Induk: ' + opt"></option>
+                            </template>
+                        </select>
+                        <div class="flex gap-2">
+                            <input type="text" x-model="newCategory" @keydown.enter.prevent="addCustomCategory" class="flex-1 border border-gray-300 rounded px-2 py-1.5 text-xs focus:ring-secondary outline-none" placeholder="Tulis kategori baru & tekan Enter">
+                            <button type="button" @click="addCustomCategory" class="bg-gray-200 hover:bg-gray-300 px-3 py-1.5 rounded text-xs font-bold text-gray-700 transition">Tambah</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Topic Input -->
+                <div class="border border-gray-200 p-3 rounded bg-white">
+                    <label class="block text-sm font-medium text-gray-700 mb-1">3. Topik / Kata Kunci AI</label>
+                    <textarea x-model="formData.topic" rows="3" class="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent bg-gray-50 bg-white" placeholder="Masukkan judul utama..." required></textarea>
+                </div>
+
+                <!-- Post Status -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">4. Opsi Penerbitan</label>
+                    <select x-model="formData.status" class="w-full border border-gray-300 rounded px-3 py-2 focus:ring-secondary bg-white text-sm">
+                        <option value="draft">Draft (Pertahankan di wp-admin)</option>
+                        <option value="publish">Publish (Tayang Publik)</option>
+                    </select>
+                </div>
+
+                <!-- Buttons Spacer -->
+                <div class="flex-grow"></div>
+    
+                <!-- Button Actions -->
+                <div class="pt-4 space-y-3 border-t mt-4 relative z-20">
+                    <button type="submit" 
+                            class="w-full bg-primary hover:bg-blue-900 text-white font-semibold py-2.5 px-4 rounded shadow transition disabled:opacity-50 flex justify-center items-center"
+                            :disabled="isLoading || !wpConnected">
+                        <svg x-show="isLoading" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span x-text="isLoading ? 'Memproses AI Engine...' : '1. GENERATE KONTEN (AI)'"></span>
+                    </button>
+                    
+                    <button type="button" @click="publishContent"
+                            x-show="result.title"
+                            class="w-full bg-accent hover:bg-green-600 text-white font-semibold py-2.5 px-4 rounded shadow transition disabled:opacity-50 flex justify-center items-center"
+                            :disabled="isPublishing">
+                        <svg x-show="isPublishing" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <span x-text="isPublishing ? 'Mempublikasikan ke WP...' : '2. PUBLISH KE WORDPRESS'"></span>
+                    </button>
+                </div>
+                
+            </form>
+        </section>
+
+        <!-- Right Panel: Output Preview -->
+        <section class="w-2/3 bg-gray-50 p-6 overflow-y-auto flex flex-col relative pb-20">
+            <h2 class="text-lg font-bold mb-5 flex items-center text-primary border-b border-gray-300 pb-2">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                Live Preview & Output
+            </h2>
+
+            <div x-show="!result.title" class="flex-1 flex flex-col items-center justify-center text-gray-400">
+                <svg class="w-20 h-20 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                <p>Belum ada data artikel. Silakan generate konten dari panel sebelah kiri.</p>
+            </div>
+
+            <!-- Content Generated wrapper -->
+            <div x-show="result.title" class="space-y-6" style="display: none;">
+                
+                <!-- Quick SEO Metadata Banner -->
+                <div class="bg-blue-50 border border-blue-200 rounded p-4 grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="text-xs font-semibold text-gray-500 uppercase">Slug URL</span>
+                        <p class="text-sm text-gray-800 break-all" x-text="result.slug"></p>
+                    </div>
+                    <div>
+                        <span class="text-xs font-semibold text-gray-500 uppercase">Keyphrase Utama</span>
+                        <p class="text-sm font-semibold text-primary" x-text="result.keyphrase"></p>
+                    </div>
+                    <div class="col-span-2 text-sm text-gray-600 bg-white p-2 rounded border border-gray-100 flex gap-2 overflow-x-auto whitespace-nowrap">
+                        <strong class="text-xs text-gray-500 pt-1 block">Keywords:</strong>
+                        <template x-for="kw in result.keywords_list">
+                            <span class="px-2 py-1 bg-gray-100 rounded-full text-xs" x-text="kw"></span>
+                        </template>
+                    </div>
+                    <div class="col-span-2">
+                        <span class="text-xs font-semibold text-gray-500 uppercase">Meta Description ({<span x-text="result.meta_description ? result.meta_description.length : 0"></span>} chars)</span>
+                        <p class="text-sm text-gray-800 italic" x-text="result.meta_description"></p>
+                    </div>
+                </div>
+
+                <!-- Live Post Article Preview -->
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    
+                    <!-- Cover Image -->
+                    <div class="h-64 bg-gray-200 w-full relative">
+                        <template x-if="result.featured_image_url">
+                            <img :src="result.featured_image_url" alt="Cover" class="w-full h-full object-cover">
+                        </template>
+                        <div x-show="!result.featured_image_url" class="absolute inset-0 flex items-center justify-center text-gray-400">
+                            No Featured Image
+                        </div>
+                    </div>
+
+                    <!-- Article Body Editor -->
+                    <div class="p-8 prose max-w-none" x-html="result.content_body">
+                    </div>
+                </div>
+                
+            </div>
+            
+        </section>
+
+    </main>
+
+    <script>
+        function automationApp() {
+            return {
+                formData: {
+                    categories: [],
+                    topic: '',
+                    wp_url: '',
+                    username: '',
+                    app_password: '',
+                    status: 'draft'
+                },
+                result: {
+                    title: null,
+                    content_body: null,
+                    featured_image_url: null,
+                    slug: null,
+                    meta_description: null,
+                    keyphrase: null,
+                    keywords_list: []
+                },
+                loadedCategories: [],
+                customCategories: [],
+                newCategory: '',
+                newCategoryParent: '',
+                newCategoryParents: {},
+                wpConnected: false,
+                isCheckingWP: false,
+                isLoading: false,
+                isPublishing: false,
+                alert: {
+                    show: false,
+                    type: '',
+                    message: ''
+                },
+                
+                showAlert(type, msg) {
+                    this.alert = { show: true, type: type, message: msg };
+                    setTimeout(() => { this.alert.show = false; }, 5000);
+                },
+
+                async checkWordPress() {
+                    if (!this.formData.wp_url || !this.formData.username || !this.formData.app_password) return;
+                    
+                    this.isCheckingWP = true;
+                    this.wpConnected = false;
+                    
+                    const formBody = new URLSearchParams({
+                        wp_url: this.formData.wp_url,
+                        username: this.formData.username,
+                        app_password: this.formData.app_password
+                    });
+                    
+                    try {
+                        const response = await fetch('/api/check-wp', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: formBody
+                        });
+                        const data = await response.json();
+                        
+                        if(response.ok) {
+                            this.loadedCategories = data.categories || [];
+                            this.wpConnected = true;
+                            this.showAlert('success', 'Koneksi sukses! Kategori WordPress berhasil ditarik.');
+                        } else {
+                            this.showAlert('error', data.error || 'Server WordPress menolak koneksi');
+                        }
+                    } catch (err) {
+                        this.showAlert('error', 'Gagal memanggil endpoint backend (Network API Error).');
+                    } finally {
+                        this.isCheckingWP = false;
+                    }
+                },
+                
+                setPrimaryCategory(cat) {
+                    const idx = this.formData.categories.indexOf(cat);
+                    if(idx > 0) {
+                        this.formData.categories.splice(idx, 1);
+                        this.formData.categories.unshift(cat);
+                    }
+                },
+                
+                addCustomCategory() {
+                    const cleanCat = this.newCategory.trim();
+                    if(cleanCat) {
+                        if (!this.loadedCategories.includes(cleanCat) && !this.customCategories.includes(cleanCat)) {
+                            this.customCategories.push(cleanCat);
+                            if (this.newCategoryParent) {
+                                this.newCategoryParents[cleanCat] = this.newCategoryParent;
+                            }
+                        }
+                        if (!this.formData.categories.includes(cleanCat)) {
+                            this.formData.categories.push(cleanCat);
+                        }
+                        this.newCategory = '';
+                        this.newCategoryParent = '';
+                    }
+                },
+
+                async generateContent() {
+                    if (this.formData.categories.length === 0) {
+                        this.showAlert('error', 'Oops, mohon centang atau buat minimal 1 Kategori.');
+                        return;
+                    }
+                    this.isLoading = true;
+                    this.alert.show = false;
+                    
+                    const primaryCat = this.formData.categories[0];
+                    
+                    const formBody = new URLSearchParams({
+                        topic: this.formData.topic,
+                        category: primaryCat
+                    });
+                    
+                    try {
+                        const response = await fetch('/api/generate', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: formBody
+                        });
+                        const data = await response.json();
+                        
+                        if(response.ok) {
+                            this.result = data;
+                            this.showAlert('success', 'Berhasil! Artikel SEO 16:9 dan formasi tag siap terbang.');
+                        } else {
+                            this.showAlert('error', data.error || 'Terjadi kesalahan saat generate');
+                        }
+                    } catch (err) {
+                        this.showAlert('error', 'Koneksi AI Backend terputus.');
+                    } finally {
+                        this.isLoading = false;
+                    }
+                },
+                
+                async publishContent() {
+                    this.isPublishing = true;
+                    this.alert.show = false;
+                    
+                    const payloadCats = this.formData.categories.map(c => {
+                        return {
+                            name: c,
+                            parent: this.newCategoryParents[c] || null
+                        };
+                    });
+                    
+                    const formBody = new URLSearchParams({
+                        wp_url: this.formData.wp_url,
+                        username: this.formData.username,
+                        app_password: this.formData.app_password,
+                        title: this.result.title,
+                        content_body: this.result.content_body,
+                        categories: JSON.stringify(payloadCats),
+                        status: this.formData.status,
+                        slug: this.result.slug,
+                        featured_image_url: this.result.featured_image_url || '',
+                        keywords_list: JSON.stringify(this.result.keywords_list || []),
+                        seo_title: this.result.seo_title || '',
+                        meta_description: this.result.meta_description || '',
+                        keyphrase: this.result.keyphrase || ''
+                    });
+                    
+                    try {
+                        const response = await fetch('/api/publish', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: formBody
+                        });
+                        const data = await response.json();
+                        
+                        if(response.ok) {
+                            this.showAlert('success', `SEMPURNA! Artikel telah diterbitkan di WordPress Anda (ID: ${data.post_id}). Cek Dashboard Admin sekarang!`);
+                        } else {
+                            this.showAlert('error', data.error || 'WordPress menolak publikasi API ini.');
+                        }
+                    } catch (err) {
+                        this.showAlert('error', 'Jalur internet terputus saat Publishing.');
+                    } finally {
+                        this.isPublishing = false;
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

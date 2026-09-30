@@ -1,0 +1,149 @@
+================================================================================
+DOKUMEN RANCANGAN UI WIREFRAME & ARSITEKTUR DATABASE
+PLATFORM AUTOMATION PEMBUATAN ARTIKEL SEO & AUTO-PUBLISHER WORDPRESS
+================================================================================
+
+[INFORMASI PROYEK]
+Nama Proyek    : WordPress Content Automation Platform (Desktop Version)
+Pengembang     : Muhammad Rizky Nurrohman (NIM: 19240401)
+Instansi       : Universitas Bina Sarana Informatika (UBSI) Kampus Solo
+Lokasi Magang  : Solo Berkah Web (Grogol, Sukoharjo)
+Environment    : Antigravity (Python Framework)
+
+================================================================================
+1. RANCANGAN ANTARMUKA (UI WIREFRAME LAYOUT)
+================================================================================
+
+Tampilan aplikasi berbasis web interaktif dengan tata letak 2 Kolom (Two-Column Dashboard) 
+menggunakan Tailwind CSS (Desktop-First).
+
+--------------------------------------------------------------------------------
+ASCII LAYOUT WIREFRAME:
+--------------------------------------------------------------------------------
+
++-----------------------------------------------------------------------------------------------+
+| [ICON] WordPress Content Automation Platform v1.0                     [Status: Engine Online] |
++--------------------------------------------------+--------------------------------------------+
+| PANEL INPUT & KONFIGURASI (Kiri)                 | PANEL LIVE PREVIEW & OUTPUT RESULT (Kanan) |
+|--------------------------------------------------|--------------------------------------------|
+| 1. Kategori Artikel:                             | [ Tab: Artikel Preview ] [ Tab: SEO Meta ] |
+|    [ Arts, Bisnis, Budaya, News...       v ]     |--------------------------------------------|
+|                                                  | PREVIEW KONTEN ARTIKEL:                    |
+| 2. Penentuan Judul:                              |                                            |
+|    (*) AI Generate   ( ) Input Manual            | [ FEATURED IMAGE PREVIEW ]                 |
+|    Topik/Judul Input:                            | (Gambar AI Otomatis)                       |
+|    [ Masukkan topik atau judul artikel...      ] |                                            |
+|                                                  | [H2] Judul Utama Artikel SEO               |
+| 3. Target WordPress Site:                        |                                            |
+|    Pilih Target: [ Website Klien A       v ]     | Paragraf pembuka artikel...                |
+|    URL WP      : [ https://website-klien.com   ] |                                            |
+|    Username    : [ admin                       ] | [H4] Sub-Bab Pertama Pembahasan            |
+|    App Pass    : [ **** **** **** ****         ] | Paragraf penjelasan yang memuat hyperlink  |
+|                                                  | Wikipedia lokasi otomatis (contoh: Sukoharjo)|
+| 4. Opsi Penerbitan:                              |                                            |
+|    Status Post: [ Draft  v ]                     |--------------------------------------------|
+|                                                  | PANEL SEO METADATA:                        |
+| +----------------------------------------------+ | * SEO Title    : ...                       |
+| | [ BUTTON ] GENERATE & PUBLISH (1-CLICK)      | | * Slug         : ...                       |
+| +----------------------------------------------+ | * Meta Desc    : ...                       |
+|                                                  | * Main Keyphrase : (4-5 kata)              |
+| [ Progress Indicator / Loading Bar           ]   | * 12 Keywords LSI: ...                     |
++--------------------------------------------------+--------------------------------------------+
+
+--------------------------------------------------------------------------------
+RINCIAN KOMPONEN PANEL UI:
+--------------------------------------------------------------------------------
+1. Panel Kontrol (Sisi Kiri):
+   - Dropdown Pilihan Kategori (14 Kategori Wajib).
+   - Radio Button Pemilihan Mode Judul (Manual vs AI Auto-Generate).
+   - Form Pengaturan Target Website WordPress (URL, Username, App Password).
+   - Choice Box Status Post (Draft / Publish).
+   - Tombol Utama "GENERATE & PUBLISH (1-CLICK)".
+
+2. Panel Pratinjau (Sisi Kanan):
+   - Display Gambar Utama (Featured Image) hasil AI.
+   - Teks Artikel Terstruktur: Tag H2 (Judul Utama), Tag H4 (Sub-Bab), dan Paragraf.
+   - Tautan Outlink Wikipedia yang terdeteksi otomatis pada teks (berwarna biru).
+   - Box Rekap SEO Metadata: SEO Title, Slug, Meta Description, Keyphrase, dan 12 Keywords.
+
+
+================================================================================
+2. SPESIFIKASI SISTEM BASIS DATA (DATABASE ARCHITECTURE)
+================================================================================
+
+Tipe Database  : SQLite 3 (Lokal, File-Based `.db`)
+ORM / Driver   : SQLAlchemy / Peewee (Python)
+Keunggulan     : 100% Gratis, Zero-Configuration, Sangat Ringan, Tanpa Server MySQL Terpisah.
+
+--------------------------------------------------------------------------------
+DIAGRAM RELASI ENTITAS (ENTITY RELATIONSHIP DIAGRAM - ERD)
+--------------------------------------------------------------------------------
+
++-----------------------+              +-----------------------------------+
+|   wp_configurations   |              |         generated_articles        |
++-----------------------+              +-----------------------------------+
+| PK | id               |<------------+| PK | id                           |
+|    | site_name        | (1 to Many)  | FK | wp_config_id                  |
+|    | wp_url           |              |    | category                      |
+|    | username         |              |    | topic_input                   |
+|    | app_password     |              |    | title                         |
+|    | created_at       |              |    | content_body                  |
++-----------------------+              |    | seo_title                     |
+                                       |    | slug                          |
+                                       |    | meta_description              |
+                                       |    | keyphrase                     |
+                                       |    | keywords_list                 |
+                                       |    | featured_image_url            |
+                                       |    | wikipedia_outlinks            |
+                                       |    | wp_post_id                    |
+                                       |    | status                        |
+                                       |    | created_at                    |
+                                       +-----------------------------------+
+
+--------------------------------------------------------------------------------
+STRUKTUR KAMUS DATA (DATA DICTIONARY):
+--------------------------------------------------------------------------------
+
+TABEL 1: `wp_configurations`
+Fungsi: Menyimpan kredensial situs WordPress target agar tidak perlu diisi manual berulang kali.
+
+| Nama Kolom    | Tipe Data    | Atribut        | Keterangan                           |
+|---------------|--------------|----------------|--------------------------------------|
+| id            | INTEGER      | PK, Auto Inc   | Primary Key unik                      |
+| site_name     | VARCHAR(100) | NOT NULL       | Label nama website (misal: Klien A)   |
+| wp_url        | VARCHAR(255) | NOT NULL       | URL domain WordPress target           |
+| username      | VARCHAR(100) | NOT NULL       | Username akun administrator WP        |
+| app_password  | VARCHAR(255) | NOT NULL       | Application Password dari WP          |
+| created_at    | DATETIME     | DEFAULT NOW    | Waktu pendaftaran data                |
+
+TABEL 2: `generated_articles`
+Fungsi: Menyimpan riwayat artikel yang berhasil di-generate AI, metadata SEO, dan status post WP.
+
+| Nama Kolom          | Tipe Data    | Atribut        | Keterangan                           |
+|---------------------|--------------|----------------|--------------------------------------|
+| id                  | INTEGER      | PK, Auto Inc   | Primary Key unik                      |
+| wp_config_id        | INTEGER      | FK, Nullable   | Relasi ke tabel `wp_configurations`   |
+| category            | VARCHAR(50)  | NOT NULL       | Kategori artikel yang dipilih        |
+| topic_input         | TEXT         | NOT NULL       | Kata kunci / judul mentah dari user   |
+| title               | TEXT         | NOT NULL       | Judul Utama Artikel (Format H2)       |
+| content_body        | TEXT         | NOT NULL       | Teks Artikel (Format H4 & Paragraf)   |
+| seo_title           | TEXT         | NOT NULL       | Title tag teroptimasi SEO            |
+| slug                | VARCHAR(200) | NOT NULL       | Permalinks / Slug URL                |
+| meta_description    | TEXT         | NOT NULL       | Ringkasan meta description (150 char) |
+| keyphrase           | VARCHAR(100) | NOT NULL       | Kata kunci utama (4-5 kata)           |
+| keywords_list       | TEXT (JSON)  | NOT NULL       | Array 12 kata kunci LSI/Turunan       |
+| featured_image_url  | TEXT         | NULLABLE       | URL/Path lokal gambar hasil AI        |
+| wikipedia_outlinks  | TEXT (JSON)  | NULLABLE       | Array link Wikipedia lokasi terdeteksi|
+| wp_post_id          | INTEGER      | NULLABLE       | ID Post resmi yang terbit di WP       |
+| status              | VARCHAR(20)  | DEFAULT 'draft'| Status penerbitan (draft / publish)   |
+| created_at          | DATETIME     | DEFAULT NOW    | Waktu pembuatan artikel              |
+
+================================================================================
+3. ALUR EKSEKUSI DATA (DATA LIFECYCLE FLOW)
+================================================================================
+
+1. User memilih kredensial WordPress yang tersimpan di tabel `wp_configurations`.
+2. AI Engine memproses teks artikel (H2/H4), gambar, metadata SEO, dan link Wikipedia.
+3. Seluruh hasil generasi disimpan ke dalam tabel `generated_articles`.
+4. System Integrator mengirimkan data dari tabel `generated_articles` ke WP REST API.
+5. Kolom `wp_post_id` dan `status` diperbarui dengan respon balik dari server WordPress.

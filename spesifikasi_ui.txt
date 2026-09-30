@@ -1,0 +1,134 @@
+================================================================================
+                    SPESIFIKASI ANTARMUKA PENGGUNA (UI DESIGN)
+================================================================================
+
+1. SKEMA WARNA & TIPOGRAFI (DESIGN SYSTEM)
+--------------------------------------------------------------------------------
+* Palette Warna Utama:
+  - Primary Color    : #1E3A8A (Navy Blue - Navbar, Header, Tombol Utama)
+  - Secondary Color  : #3B82F6 (Royal Blue - Highlight, Focus State, Hover)
+  - Accent Color     : #10B981 (Emerald Green - Status Aktif, Tombol Sukses)
+  - Neutral Dark     : #1F2937 (Charcoal - Teks Utama)
+  - Neutral Light    : #F3F4F6 (Cool Gray - Background Aplikasi)
+  - Card / Surface   : #FFFFFF (White - Latar Belakang Komponen/Kartu)
+  - Status Alert     : 
+    * Success : #059669 (Hijau)
+    * Warning : #D97706 (Kuning/Orange)
+    * Danger  : #DC2626 (Merah)
+
+* Tipografi:
+  - Font Family : Inter / Roboto / Sans-serif
+  - Heading 1   : Bold, 24px
+  - Heading 2   : SemiBold, 18px
+  - Subheading  : Medium, 14px
+  - Body Text   : Regular, 14px
+  - Small / Caption : Regular, 12px
+
+--------------------------------------------------------------------------------
+2. LAYOUT UTAMA (GLOBAL LAYOUT)
+--------------------------------------------------------------------------------
+[ Header / Top Navbar ] --------------------------------------------------------
+* Logo Aplikasi (Kiri)
+* Global Search Bar (Tengah)
+* Menu Aksi Kanan:
+  - Notifikasi (Icon Lonceng + Badge Jumlah)
+  - Profil User (Avatar, Nama User, Dropdown Menu Logout)
+
+[ Sidebar / Left Navigation ] --------------------------------------------------
+* Menu Dashboard
+* Menu Data Master (User, Produk/Kategori)
+* Menu Transaksi / Aktivitas
+* Menu Laporan / Analitik
+* Menu Pengaturan System
+* Sidebar Toggle (Collapse / Expand)
+
+[ Content Area ] ---------------------------------------------------------------
+* Breadcrumb Navigation (misal: Home > Dashboard > Data User)
+* Page Title & Quick Action Button
+* Main Content Container (Kartu Stat, Tabel, Form)
+
+--------------------------------------------------------------------------------
+3. WIREFRAME TEKS & STRUKTUR HALAMAN
+--------------------------------------------------------------------------------
+
+3.1 HALAMAN DASHBOARD
++------------------------------------------------------------------------------+
+| [LOGO] System App                  [ Search... ]           (🔔) [👤 Admin ▾] |
++---------------+--------------------------------------------------------------+
+| 🏠 Dashboard   | Breadcrumb: Home / Dashboard                                 |
+| 📊 Data Master|                                                              |
+| 💳 Transaksi  | [ CARD 1: Total User ]  [ CARD 2: Penjualan ]  [ CARD 3: Status]|
+| 📈 Laporan    | | 1,250 User          |  | Rp 45,200,000    |  | 98.5% Active   ||
+| ⚙️ Pengaturan  | +---------------------+  +------------------+  +----------------+|
+|               |                                                              |
+|               | [ CHART: Grafik Aktivitas Bulanan ]                           |
+|               | +----------------------------------------------------------+ |
+|               | |  |                                                       | |
+|               | |  |___/\____/\________________                           | |
+|               | +----------------------------------------------------------+ |
+|               |                                                              |
+|               | [ TABEL: Transaksi Terakhir ]          [ Lihat Semua -> ]    |
+|               | +----+------------------+---------------+------------------+ |
+|               | | ID | Tanggal          | Pengguna      | Status           | |
+|               | +----+------------------+---------------+------------------+ |
+|               | | 01 | 2026-09-23       | Budi Santoso  | [ Sukses ]       | |
+|               | | 02 | 2026-09-23       | Siti Aminah   | [ Pending ]      | |
+|               | +----+------------------+---------------+------------------+ |
++---------------+--------------------------------------------------------------+
+
+3.2 HALAMAN TABEL DATA / MANAJEMEN
++------------------------------------------------------------------------------+
+| Manajemen Data                                         [ + Tambah Data Baru ]|
++------------------------------------------------------------------------------+
+| Filter: [ Semua Status ▾ ]  [ Tanggal ▾ ]               Cari: [________]     |
++------------------------------------------------------------------------------+
+| [ ] | ID   | Nama           | Email              | Peran    | Aksi           |
++-----+------+----------------+--------------------+----------+----------------+
+| [ ] | US01 | Ahmad Fauzi    | ahmad@email.com    | Admin    | [✏️] [🗑️] [👁️]   |
+| [ ] | US02 | Rina Wijaya    | rina@email.com     | User     | [✏️] [🗑️] [👁️]   |
+| [ ] | US03 | Eko Prasetyo   | eko@email.com      | Editor   | [✏️] [🗑️] [👁️]   |
++-----+------+----------------+--------------------+----------+----------------+
+| Menampilkan 1 - 3 dari 50 data                         [< Sebelumnya] [1] 2 3 [Selanjutnya >]
+
+3.3 HALAMAN FORM INPUT / EDIT
++------------------------------------------------------------------------------+
+| Form Input Data Pengguna                                                     |
++------------------------------------------------------------------------------+
+| Nama Lengkap *                                                               |
+| [ Input nama lengkap...                                                    ] |
+|                                                                              |
+| Alamat Email *                                                               |
+| [ Input email aktif...                                                     ] |
+|                                                                              |
+| Role / Hak Akses *                                                           |
+| [ Pilih Role ▾                                                             ] |
+|                                                                              |
+| Upload Foto Profil                                                           |
+| +--------------------------------------------------------------------------+ |
+| |  📁 Tarik & lepas file di sini atau [ Pilih File ]                       | |
+| +--------------------------------------------------------------------------+ |
+|                                                                              |
+| [ Batal ]                                                     [ Simpan Data ]|
++------------------------------------------------------------------------------+
+
+--------------------------------------------------------------------------------
+4. KOMPONEN UTAMA & INTERAKSI (UI COMPONENTS)
+--------------------------------------------------------------------------------
+* Tombol (Buttons):
+  - Primary Button   : Solid Background #1E3A8A, Teks Putih, Rounded 6px.
+  - Secondary Button : Border #1E3A8A, Background Transparan, Teks #1E3A8A.
+  - Danger Button    : Solid Background #DC2626, Teks Putih.
+
+* Form Input:
+  - Border Gray (#D1D5DB), Height 40px, Padding 10px.
+  - Focus State: Border Blue (#3B82F6), Ring Outline Soft Blue.
+  - Error State: Border Red (#DC2626) + Pesan Teks Merah di bawah input.
+
+* Modal / Pop-up Dialog:
+  - Semi-transparent Overlay (#000000 50% Opacity).
+  - Box Modal di tengah layar dengan opsi header, body, dan footer tombol aksi.
+
+* Notification Toast:
+  - Position: Top-Right.
+  - Auto-dismiss setelah 3-5 detik.
+================================================================================

@@ -1,0 +1,124 @@
+================================================================================
+PRODUCT REQUIREMENT DOCUMENT (PRD)
+PLATFORM AUTOMATION PEMBUATAN ARTIKEL SEO & AUTO-PUBLISHER WORDPRESS
+================================================================================
+
+[INFORMASI PROYEK]
+Nama Proyek    : WordPress Content Automation Platform (Desktop Version)
+Pengembang     : Muhammad Rizky Nurrohman (NIM: 19240401)
+Instansi       : Universitas Bina Sarana Informatika (UBSI) Kampus Solo
+Lokasi Magang  : Solo Berkah Web (Grogol, Sukoharjo)
+Environment    : Antigravity (Python Framework)
+Target User    : Tim Internal / Specialist SEO Solo Berkah Web
+
+================================================================================
+1. RINGKASAN PROYEK & TUJUAN
+================================================================================
+Membangun aplikasi web berbasis Python yang mengotomatiskan seluruh alur kerja 
+pembuatan artikel teroptimasi SEO. Sistem ini memangkas proses manual dengan 
+menghasilkan teks artikel berstruktur khusus (H2/H4/Paragraf), riset kata kunci, 
+pembuatan gambar otomatis, ekstraksi tautan luar (outlink Wikipedia lokasi), hingga 
+penerbitan langsung ke WordPress CMS target dalam 1 kali klik.
+
+Tujuan Utama:
+- Efisiensi waktu pembuatan & posting artikel harian untuk klien.
+- Menghasilkan artikel berstruktur SEO friendly yang siap menarik engagement.
+- Menggunakan 100% stack & API gratis tanpa batasan token.
+
+================================================================================
+2. SPESIFIKASI FITUR & PERSYARATAN FUNGSIONAL
+================================================================================
+
+A. MODUL INPUT (USER INTERFACE)
+--------------------------------------------------------------------------------
+1. Pilihan Kategori Artikel (Dropdown 14 Kategori):
+   - Arts, Bisnis, Budaya, Featured, Internet, Kesehatan, Kuliner, News, 
+     Politik, Style, Travel, Olahraga, Pendidikan, Uncategorized.
+2. Opsi Penentuan Judul:
+   - Mode Manual: User memasukkan judul artikel sendiri.
+   - Mode AI: User memasukkan kata kunci utama, AI menggenerasi opsi judul menarik.
+3. Konfigurasi Target WordPress:
+   - Form input URL WordPress target (contoh: https://domainklien.com).
+   - Form Username & Application Password dari WP target.
+4. Opsi Status Publikasi:
+   - Choice Toggle/Radio: "Draft" (untuk ditinjau) atau "Publish" (langsung tayang).
+
+B. MODUL AI TEXT & SEO ENGINE
+--------------------------------------------------------------------------------
+1. Menggunakan LLM API Gratis (Google Gemini API / Groq API).
+2. Menghasilkan Output SEO Lengkap:
+   - Judul Artikel & SEO Title
+   - Slug (URL-friendly string)
+   - Meta Description (150-160 karakter)
+   - Main Keyphrase (4 - 5 kata)
+   - 12 Keywords LSI (Turunan kata kunci)
+
+C. KETENTUAN FORMATTING TEKS
+--------------------------------------------------------------------------------
+Teks yang dihasilkan BUKAN berupa HTML mentah, melainkan struktur teks bersih:
+- Tag H2 : Digunakan khusus untuk Judul Utama Artikel.
+- Tag H4 : Digunakan khusus untuk Sub-judul / Poin-poin Bab Pembahasan.
+- Paragraf : Digunakan untuk seluruh narasi penjelasan artikel.
+
+D. MODUL EKSTRAKSI OUTLINK WIKIPEDIA OTOMATIS
+--------------------------------------------------------------------------------
+1. System/Script memindai teks artikel untuk mendeteksi nama lokasi/daerah 
+   (contoh: Sukoharjo, Surakarta, Jakarta, dll).
+2. Secara otomatis menyisipkan hyperlink ke Wikipedia Indonesia pada nama daerah 
+   tersebut (Contoh: https://id.wikipedia.org/wiki/Kabupaten_Sukoharjo).
+3. Berfungsi sebagai outlink berkualitas untuk meningkatkan skor SEO On-Page.
+
+E. MODUL AI IMAGE GENERATOR ENGINE
+--------------------------------------------------------------------------------
+1. Menggunakan API Gambar Gratis tanpa batasan limit (Pollinations.ai / Hugging Face).
+2. Secara otomatis membuat 1 Featured Image berdasarkan konteks judul/isi artikel.
+
+F. MODUL INTEGRASI WORDPRESS REST API (1-KLIK POSTING)
+--------------------------------------------------------------------------------
+1. Auto-Upload Media: Mengunggah gambar hasil AI ke WordPress Media Library 
+   via Endpoint: `/wp-json/wp/v2/media`.
+2. Auto-Post Article: Mengirimkan teks artikel, metadata SEO, kategori, dan 
+   Featured Image ID ke Endpoint: `/wp-json/wp/v2/posts`.
+
+================================================================================
+3. ARSITEKTUR TEKNIS & TECH STACK (100% GRATIS)
+================================================================================
+- Development Environment : Antigravity
+- Backend Framework       : Python (FastAPI atau Flask)
+- Frontend Framework      : HTML5 + Tailwind CSS (via CDN)
+- AI Text Engine          : Google Gemini API / Groq API (Free Tier)
+- AI Image Engine         : Pollinations.ai API / Hugging Face Inference
+- CMS Target Integration  : WordPress REST API + Application Passwords
+- Data Transport          : JSON / HTTP REST Client
+
+================================================================================
+4. STRUKTUR FILE & DIREKTORI PROYEK (ANTIGRAVITY SETUP)
+================================================================================
+wp-automation-app/
+├── config/
+│   └── settings.py          # Konfigurasi aplikasi & default URL WP
+├── core/
+│   ├── ai_text_engine.py    # Generasi teks, SEO metadata, & link Wikipedia
+│   ├── ai_image_engine.py   # Generasi gambar via API Pollinations/HF
+│   └── wp_integrator.py     # Logika pengiriman REST API ke WordPress
+├── web/
+│   ├── static/              # Asset CSS/JS untuk antarmuka web
+│   └── templates/
+│       └── index.html       # UI utama (Responsive Desktop-first)
+├── .env                     # Tempat menyimpan API Keys secara aman
+├── app.py                   # Entry-point utama aplikasi web backend
+└── requirements.txt         # Dependency pustaka Python (requests, fastapi, uvicorn)
+
+================================================================================
+5. TAHAPAN EKSEKUSI (ROADMAP IMPLEMENTASI)
+================================================================================
+- TAHAP 1: Inisialisasi struktur direktori & file di Antigravity + `requirements.txt`.
+- TAHAP 2: Pengembangan & pengujian `ai_text_engine.py` (Prompting H2/H4, SEO, Wikipedia).
+- TAHAP 3: Pengembangan `ai_image_engine.py` untuk pembuatan Featured Image.
+- TAHAP 4: Pengujian integrasi `wp_integrator.py` (Tes REST API ke WordPress).
+- TAHAP 5: Pembangunan antarmuka web `index.html` (Tailwind CSS) & penggabungan alur.
+
+================================================================================
+Dibuat pada: 2026-09-23
+Status Dokumen: Approved / Ready for Development
+================================================================================
